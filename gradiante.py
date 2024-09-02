@@ -10,8 +10,10 @@ Original file is located at
 """
 
 import numpy as np
+import pandas
 
-def gradient_descent(Q, c, x0, epsilon, N, alpha_strategy):
+
+def gradient_descent(Q, c, x0, epsilon, N, alpha_strategy, alpha):
     """
     Implementación del algoritmo Gradient Descent para una función cuadrática.
 
@@ -26,6 +28,14 @@ def gradient_descent(Q, c, x0, epsilon, N, alpha_strategy):
     Returns:
     - history: Lista con las iteraciones (k, x_k, p_k, ||∇f(x_k)||).
     """
+
+    arrayk = []
+    arrayx = []
+    arrayp_k = []
+    arraygrad_norm = []
+
+
+
     def gradient(x):
         return np.dot(Q, x) + c
 
@@ -33,7 +43,7 @@ def gradient_descent(Q, c, x0, epsilon, N, alpha_strategy):
         return np.dot(grad, grad) / np.dot(np.dot(grad, Q), grad)
 
     x = x0
-    history = []
+    # history = []
 
     for k in range(N):
         grad = gradient(x)
@@ -42,36 +52,45 @@ def gradient_descent(Q, c, x0, epsilon, N, alpha_strategy):
         if grad_norm < epsilon:
             break
 
-        if alpha_strategy == 'exact':
+        if alpha_strategy == 'exacto':
             alpha_k = exact_step_size(x, grad)
-        elif alpha_strategy == 'constant':
-            alpha_k = 0.1  # aqui se colocan los diferentes valores de a
+        elif alpha_strategy == 'constante':
+            alpha_k = alpha
         elif alpha_strategy == 'variable':
             alpha_k = 1 / (k + 1)
-        else:
-            raise ValueError("Invalid alpha_strategy. Choose from 'exact', 'constant', or 'variable'.")
 
         p_k = -grad
         x = x + alpha_k * p_k
 
-        history.append((k, x, p_k, grad_norm))
+        print("k",k)
+        arrayk.append(k + 1)
 
-    return history
+        string_x = ' '.join(f'{num:.2f}' for num in x)
+        arrayx.append(string_x) 
 
-# Aqui se ingresan los valores del parametro (como aparecen en el ejercicio)
-Q = np.array([[2, -1, 0], [-1, 2, -1], [0, -1, 2]])
-c = np.array([1, 0, 1])
-x0 = np.array([3, 5, 7])
-epsilon = 1e-6
-N = 30
-for alpha_strategy in ['exact', 'constant', 'variable']:
-    result = gradient_descent(Q, c, x0, epsilon, N, alpha_strategy)
+        string_p_k = ' '.join(f'{num:.2f}' for num in p_k)
+        arrayp_k.append(string_p_k) 
 
-    print(f"Resultados para alpha_strategy = {alpha_strategy}")
-    print("k\t x_k\t\t p_k\t\t ||∇f(x_k)||")
-    for k, x_k, p_k, grad_norm in result:
-        print(f"{k}\t {x_k}\t {p_k}\t {grad_norm}")
-    print("\n")
+        print("grad_norm",grad_norm)
+        arraygrad_norm.append(grad_norm)
+        # history.append((k, x, p_k, grad_norm))
+
+    TableOut = pandas.DataFrame({'Iter':arrayk, 'Xn':arrayx, 'P_k': arrayp_k, 'P_grad': arraygrad_norm})
+    return TableOut
+# # Aqui se ingresan los valores del parametro (como aparecen en el ejercicio)
+# Q = np.array([[2, -1, 0], [-1, 2, -1], [0, -1, 2]])
+# c = np.array([1, 0, 1])
+# x0 = np.array([3, 5, 7])
+# epsilon = 1e-6
+# N = 30
+# for alpha_strategy in ['exact', 'constant', 'variable']:
+#     result = gradient_descent(Q, c, x0, epsilon, N, alpha_strategy)
+
+#     print(f"Resultados para alpha_strategy = {alpha_strategy}")
+#     print("k\t x_k\t\t p_k\t\t ||∇f(x_k)||")
+#     for k, x_k, p_k, grad_norm in result:
+#         print(f"{k}\t {x_k}\t {p_k}\t {grad_norm}")
+#     print("\n")
 
 """# Problema #2"""
 
@@ -102,6 +121,10 @@ def gradient_descent_rosenbrock(x0, alpha, epsilon, N):
     """
     x = x0
     history = []
+    arrayk = []
+    arrayx = []
+    arrayp_k = []
+    arraygrad_norm = []
 
     for k in range(N):
         grad = rosenbrock_gradient(x)
@@ -113,21 +136,33 @@ def gradient_descent_rosenbrock(x0, alpha, epsilon, N):
         p_k = -grad
         x = x + alpha * p_k
 
+        print("k",k)
+        arrayk.append(k + 1)
+
+        string_x = ' '.join(f'{num:.2f}' for num in x)
+        arrayx.append(string_x) 
+
+        string_p_k = ' '.join(f'{num:.2f}' for num in p_k)
+        arrayp_k.append(string_p_k) 
+
+        print("grad_norm",grad_norm)
+        arraygrad_norm.append(grad_norm)
         history.append((k, x.copy(), p_k.copy(), grad_norm))
 
-    return history
+    TableOut = pandas.DataFrame({'Iter':arrayk, 'Xn':arrayx, 'P_k': arrayp_k, 'P_grad': arraygrad_norm})
+    return TableOut
 
-# Aqui se colocan los paramertros que se desean evaliar del problema
-x0 = np.array([0, 0])
-alpha = 0.05
-epsilon = 1e-8
-N = 1000
+# # Aqui se colocan los paramertros que se desean evaliar del problema
+# x0 = np.array([0, 0])
+# alpha = 0.05
+# epsilon = 1e-8
+# N = 1000
 
-# Ejecutar el algoritmo
-result = gradient_descent_rosenbrock(x0, alpha, epsilon, N)
+# # Ejecutar el algoritmo
+# result = gradient_descent_rosenbrock(x0, alpha, epsilon, N)
 
-# Mostrar los resultados
-print("Resultados para la función de Rosenbrock")
-print("k\t x_k\t\t\t\t p_k\t\t\t ||∇f(x_k)||")
-for k, x_k, p_k, grad_norm in result:
-    print(f"{k}\t {x_k}\t {p_k}\t {grad_norm}")
+# # Mostrar los resultados
+# print("Resultados para la función de Rosenbrock")
+# print("k\t x_k\t\t\t\t p_k\t\t\t ||∇f(x_k)||")
+# for k, x_k, p_k, grad_norm in result:
+#     print(f"{k}\t {x_k}\t {p_k}\t {grad_norm}")
